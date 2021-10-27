@@ -1,146 +1,121 @@
-import java.io.*;
 import java.util.*;
-import java.util.Scanner;
+
+class BinarySearchResult {
+    public int numeroCerto;
+    public int numeroProximoBaixo;
+    public int numeroProximoCima;
+
+    BinarySearchResult(int numeroCerto, int numeroProximoBaixo, int numeroProximoCima) {
+        this.numeroCerto = numeroCerto;
+        this.numeroProximoBaixo = numeroProximoBaixo;
+        this.numeroProximoCima = numeroProximoCima;
+    }
+}
 
 public class Daa010 {
 
-    public static Integer[] findClosest(Integer a[], Integer key) {
-        // 1. criar o retorno vazio
-        Integer[] resultado = new Integer[2];
-        resultado[0] = null;
-        resultado[1] = null;
+    public static void somaProxima(int[] somas, int procurado) {
 
-        // 2. popular o retorno
+        BinarySearchResult resultado = binarySearch(somas, 0, somas.length-1, procurado);
 
-        int tamanhoArray = a.length;
+        if (procurado <= somas[0]) {
+            System.out.println(somas[0]);
+        } else if (procurado >= somas[somas.length - 1]) {
+            System.out.println(somas[somas.length - 1]);
+        } else if (resultado.numeroCerto >= 0) {
+            System.out.println(somas[resultado.numeroCerto]);
+        } else if (resultado.numeroProximoBaixo >= 0 && resultado.numeroProximoCima >= 0) {
+            int cima = somas[resultado.numeroProximoCima];
+            int baixo = somas[resultado.numeroProximoBaixo];
 
-        if (key <= a[0]) {
-            resultado[0] = a[0];
-            return resultado;
+            if (procurado - baixo == cima - procurado) {
+                System.out.println(somas[resultado.numeroProximoBaixo] + " " + somas[resultado.numeroProximoCima]);
+            } else if (procurado - baixo < cima - procurado) {
+                System.out.println(somas[resultado.numeroProximoBaixo]);
+            } else {
+                System.out.println(somas[resultado.numeroProximoCima]);
+            }
         }
 
-        if (key >= a[tamanhoArray - 1]) {
-            resultado[0] = a[tamanhoArray - 1];
-            return resultado;
+    }
+  
+
+    public static BinarySearchResult binarySearch(int[] vetor, int low, int high, int key) {
+        while (low <= high) {
+            int middle = low + (high - low) / 2;
+
+            if (key == vetor[middle]) {
+                return new BinarySearchResult(middle, -1, -1);
+            } else if (key < vetor[middle]) {
+                high = middle - 1;
+
+            } else {
+                low = middle + 1;
+
+            }
         }
-
-        // binary search
-        int i = 0;
-        int j = tamanhoArray;
-        int middle = 0;
-
-        while (i < j) {
-            middle = (i + j) / 2;
-
-            if (a[middle] == key) {
-                resultado[0] = a[middle];
-                return resultado;
-            }
-
-            if (key < a[middle]) {
-                if (middle > 0 && key > a[middle - 1]) {
-                    System.out.println("XX" + getClosest(a[middle - 1], a[middle], key));
-                    resultado[0] = getClosest(a[middle - 1], a[middle], key);
-                    return resultado;
-                }
-                j = middle;
-            }
-
-            if (key > a[middle]) {
-                if (middle < tamanhoArray - 1 && key < a[middle + 1]) {
-                    System.out.println("YY" + getClosest(a[middle], a[middle + 1], key));
-                    resultado[1] = getClosest(a[middle], a[middle + 1], key);
-
-                    // 1 existe numero anterior?
-
-                    // 2 se sim, qual é?
-
-                    // existe numero posterrio?
-
-                    // se sim qual é
-
-                    // o numero anterior tem a mesma diferença para a key do que o que está no resultado[0]?
-
-                    // e o numero posterior?
-
-                    // se sim, em algum deles, preencher o resultado[1] e retornar como estºa
-                    return resultado;
-                }
-                i = middle + 1;
-            }
-
-        
-        }
-
-        // 3. retornar
-        resultado[0] = a[middle];
-        return resultado;
+        return new BinarySearchResult(-1, low-1, high + 1);
     }
 
-    public static Integer getClosest(Integer limiteInferior, Integer limiteSuperior, Integer key) {
-        if (key - limiteInferior >= limiteSuperior - key) {
-            return limiteSuperior;
+    public static int sizeArraySomas(int n) {
+
+        int resultado = (n * (n - 1)) / 2;
+        return resultado;
+
+    }
+
+    public static int[] criarArraySomas(int[] numeros) {
+
+        int tamanho = sizeArraySomas(numeros.length);
+
+        int[] somas = new int[tamanho];
+
+        int contador = 0;
+
+        for (int i = 0; i < numeros.length; i++) {
+            for (int j = i + 1; j < numeros.length; j++) {
+                somas[contador] = numeros[i] + numeros[j];
+                contador++;
+            }
         }
-        return limiteInferior;
+
+        Arrays.sort(somas);
+
+        return somas;
+
     }
 
     public static void main(String[] args) {
 
         Scanner stdin = new Scanner(System.in);
 
-        int cardinalidadeDoConjunto = stdin.nextInt();
+        int cardinalInteiros = stdin.nextInt();
 
-        int[] arrayConjunto = new int[cardinalidadeDoConjunto];
+        int[] inteiros = new int[cardinalInteiros];
 
-        for (int i = 0; i < cardinalidadeDoConjunto; i++) {
-            arrayConjunto[i] = stdin.nextInt();
+        for (int i = 0; i < cardinalInteiros; i++) {
+            inteiros[i] = stdin.nextInt();
         }
 
-        Arrays.sort(arrayConjunto);
+        Arrays.sort(inteiros);
 
-        /*
-         * for(int i = 0; i < cardinalidadeDoConjunto; i++){
-         * System.out.print(arrayConjunto[i] + "  "); } System.out.println();
-         */
+        int[] somas = criarArraySomas(inteiros);
+       
+        
 
-        Integer paresDeSomas = (cardinalidadeDoConjunto * (cardinalidadeDoConjunto - 1)) / 2;
-        Integer[] soma = new Integer[paresDeSomas];
-        Integer counter = 0;
+        int tamanhoQueries = stdin.nextInt();
 
-        // System.out.print("Somas: ");
-        for (int i = 0; i < cardinalidadeDoConjunto; i++) {
-            for (int j = i + 1; j < cardinalidadeDoConjunto; j++) {
-                soma[counter] = arrayConjunto[i] + arrayConjunto[j];
+        int[] queries = new int[tamanhoQueries];
 
-                // System.out.print(soma[counter] + " ");
-
-                counter++;
-            }
+        for (int i = 0; i < tamanhoQueries; i++) {
+            queries[i] = stdin.nextInt();
 
         }
-        // System.out.println();
 
-        Arrays.sort(soma);
-
-        /*
-         * System.out.print("Somas ordenadas: "); for (int i = 0; i < paresDeSomas;
-         * i++){ System.out.print(soma[i] + "    "); } System.out.println();
-         */
-
-        Integer cardinalidadePerguntas = stdin.nextInt();
-
-        Integer[] somasDesejadas = new Integer[cardinalidadePerguntas];
-
-        // System.out.print("Somas pretendidas [");
-        for (int i = 0; i < cardinalidadePerguntas; i++) {
-            somasDesejadas[i] = stdin.nextInt();
-            // System.out.print(somasDesejadas[i] + ", ");
+        for (int i = 0; i < queries.length; i++) {
+            somaProxima(somas, queries[i]);
         }
 
-        Integer[] resultado = findClosest(soma, 21);
-
-        System.out.println(resultado[0] + " " + resultado[1]);
-
+        
     }
-
 }
